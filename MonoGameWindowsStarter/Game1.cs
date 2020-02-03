@@ -16,9 +16,9 @@ namespace MonoGameWindowsStarter
         Texture2D ball;
         Vector2 ballPosition = Vector2.Zero;
         Vector2 ballVelocity;
-        Texture2D paddle;
-        Rectangle paddleRect;
-        int paddleSpeed = 0;
+
+        Paddle paddle;
+
         KeyboardState oldKeyboardState;
         KeyboardState newKeyboardState;
 
@@ -26,6 +26,7 @@ namespace MonoGameWindowsStarter
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            paddle = new Paddle(this);
         }
 
         /// <summary>
@@ -47,11 +48,6 @@ namespace MonoGameWindowsStarter
             );
             ballVelocity.Normalize();
 
-            paddleRect.X = 0;
-            paddleRect.Y = 0;
-            paddleRect.Width = 50;
-            paddleRect.Height = 250;
-
             base.Initialize();
         }
 
@@ -66,7 +62,7 @@ namespace MonoGameWindowsStarter
 
             // TODO: use this.Content to load your game content here
             ball = Content.Load<Texture2D>("ball");
-            paddle = Content.Load<Texture2D>("pixel");
+            paddle.LoadContent(Content);
         }
 
         /// <summary>
@@ -93,27 +89,7 @@ namespace MonoGameWindowsStarter
             if (newKeyboardState.IsKeyDown(Keys.Escape))
                 Exit();
 
-            if(newKeyboardState.IsKeyDown(Keys.Up) 
-                && !oldKeyboardState.IsKeyDown(Keys.Up))
-            {
-                paddleSpeed -= 1;
-            }
-
-            if(newKeyboardState.IsKeyDown(Keys.Down)
-                && !oldKeyboardState.IsKeyDown(Keys.Down))
-            {
-                paddleSpeed += 1;
-            }
-
-            paddleRect.Y += paddleSpeed;
-            if (paddleRect.Y < 0)
-            {
-                paddleRect.Y = 0;
-            }
-            if (paddleRect.Y > GraphicsDevice.Viewport.Height - paddleRect.Height)
-            {
-                paddleRect.Y = GraphicsDevice.Viewport.Height - paddleRect.Height;
-            }
+            paddle.Update(gameTime);
 
             // TODO: Add your update logic here
             ballPosition += (float)gameTime.ElapsedGameTime.TotalMilliseconds * ballVelocity;
@@ -168,7 +144,7 @@ namespace MonoGameWindowsStarter
                     100, 
                     100), 
                     Color.White);
-            spriteBatch.Draw(paddle, paddleRect, Color.Red);
+            paddle.Draw(spriteBatch);
             spriteBatch.End();
 
 

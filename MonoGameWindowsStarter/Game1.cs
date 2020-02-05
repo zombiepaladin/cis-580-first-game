@@ -12,13 +12,12 @@ namespace MonoGameWindowsStarter
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        Random random = new Random();
-        Texture2D ball;
-        Vector2 ballPosition = Vector2.Zero;
-        Vector2 ballVelocity;
-
+        Ball ball;
         Paddle paddle;
 
+        public Random Random = new Random();
+        
+        
         KeyboardState oldKeyboardState;
         KeyboardState newKeyboardState;
 
@@ -27,6 +26,7 @@ namespace MonoGameWindowsStarter
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             paddle = new Paddle(this);
+            ball = new Ball(this);
         }
 
         /// <summary>
@@ -37,17 +37,12 @@ namespace MonoGameWindowsStarter
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            // Set the game screen size
             graphics.PreferredBackBufferWidth = 1042;
             graphics.PreferredBackBufferHeight = 768;
             graphics.ApplyChanges();
-
-            ballVelocity = new Vector2(
-                (float)random.NextDouble(),
-                (float)random.NextDouble()
-            );
-            ballVelocity.Normalize();
-
+            ball.Initialize();
+            paddle.Initialize();
             base.Initialize();
         }
 
@@ -59,9 +54,7 @@ namespace MonoGameWindowsStarter
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            // TODO: use this.Content to load your game content here
-            ball = Content.Load<Texture2D>("ball");
+            ball.LoadContent(Content);
             paddle.LoadContent(Content);
         }
 
@@ -90,38 +83,15 @@ namespace MonoGameWindowsStarter
                 Exit();
 
             paddle.Update(gameTime);
+            ball.Update(gameTime);
+
+            if(paddle.Bounds.CollidesWith(ball.Bounds)) {
+                ball.Velocity.X *= -1;
+                var delta =  (paddle.Bounds.X + paddle.Bounds.Width) - (ball.Bounds.X - ball.Bounds.Radius);
+                ball.Bounds.X += 2*delta;
+            }
 
             // TODO: Add your update logic here
-            ballPosition += (float)gameTime.ElapsedGameTime.TotalMilliseconds * ballVelocity;
-
-            // Check for wall collisions
-            if(ballPosition.Y < 0)
-            {
-                ballVelocity.Y *= -1;
-                float delta = 0 - ballPosition.Y;
-                ballPosition.Y += 2 * delta;
-            }
-
-            if(ballPosition.Y > graphics.PreferredBackBufferHeight - 100)
-            {
-                ballVelocity.Y *= -1;
-                float delta = graphics.PreferredBackBufferHeight - 100 - ballPosition.Y;
-                ballPosition.Y += 2 * delta;
-            }
-
-            if (ballPosition.X < 0)
-            {
-                ballVelocity.X *= -1;
-                float delta = 0 - ballPosition.X;
-                ballPosition.X += 2 * delta;
-            }
-
-            if (ballPosition.X > graphics.PreferredBackBufferWidth - 100)
-            {
-                ballVelocity.X *= -1;
-                float delta = graphics.PreferredBackBufferWidth - 100 - ballPosition.X;
-                ballPosition.X += 2 * delta;
-            }
 
             oldKeyboardState = newKeyboardState;
             base.Update(gameTime);
@@ -137,16 +107,11 @@ namespace MonoGameWindowsStarter
 
             // TODO: Add your drawing code here
             spriteBatch.Begin();
-            spriteBatch.Draw(ball, 
-                new Rectangle(
-                    (int)ballPosition.X, 
-                    (int)ballPosition.Y, 
-                    100, 
-                    100), 
-                    Color.White);
-            paddle.Draw(spriteBatch);
-            spriteBatch.End();
 
+            ball.Draw(spriteBatch);
+            paddle.Draw(spriteBatch);
+            
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }

@@ -10,12 +10,24 @@ using Microsoft.Xna.Framework.Content;
 
 namespace MonoGameWindowsStarter
 {
+    /// <summary>
+    /// A class representing a paddle
+    /// </summary>
     public class Paddle
     {
+        /// <summary>
+        /// The game object
+        /// </summary>
         Game1 game;
 
-        BoundingRectangle bounds;
+        /// <summary>
+        /// This paddle's bounds
+        /// </summary>
+        public BoundingRectangle Bounds;
 
+        /// <summary>
+        /// This paddle's texture
+        /// </summary>
         Texture2D texture;
 
         /// <summary>
@@ -27,44 +39,70 @@ namespace MonoGameWindowsStarter
             this.game = game;
         }
 
+        /// <summary>
+        /// Initializes the paddle, setting its initial size 
+        /// and centering it on the left side of the screen.
+        /// </summary>
+        public void Initialize()
+        {
+            Bounds.Width = 25;
+            Bounds.Height = 200;
+            Bounds.X = 0;
+            Bounds.Y = game.GraphicsDevice.Viewport.Height / 2 - Bounds.Height / 2;
+        }
+
+        /// <summary>
+        /// Loads the paddle's content
+        /// </summary>
+        /// <param name="content">The ContentManager to use</param>
         public void LoadContent(ContentManager content)
         {
             texture = content.Load<Texture2D>("pixel");
-            bounds.Width = 50;
-            bounds.Height = 200;
-            bounds.X = 0;
-            bounds.Y = game.GraphicsDevice.Viewport.Height / 2 - bounds.Height / 2;
         }
 
+        /// <summary>
+        /// Updates the paddle
+        /// </summary>
+        /// <param name="gameTime">The game's GameTime</param>
         public void Update(GameTime gameTime)
         {
             var keyboardState = Keyboard.GetState();
+
+            // Move the paddle up if the up key is pressed
             if (keyboardState.IsKeyDown(Keys.Up))
             {
                 // move up
-                bounds.Y -= (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+                Bounds.Y -= (float)gameTime.ElapsedGameTime.TotalMilliseconds;
             }
 
-
+            // Move the paddle down if the down key is pressed
             if (keyboardState.IsKeyDown(Keys.Down))
             {
                 // move down
-                bounds.Y += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+                Bounds.Y += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
             }
 
-            if (bounds.Y < 0)
+            // Stop the paddle from going off-screen
+            if (Bounds.Y < 0)
             {
-                bounds.Y = 0;
+                Bounds.Y = 0;
             }
-            if (bounds.Y > game.GraphicsDevice.Viewport.Height - bounds.Height)
+            if (Bounds.Y > game.GraphicsDevice.Viewport.Height - Bounds.Height)
             {
-                bounds.Y = game.GraphicsDevice.Viewport.Height - bounds.Height;
+                Bounds.Y = game.GraphicsDevice.Viewport.Height - Bounds.Height;
             }
         }
 
+        /// <summary>
+        /// Draw the paddle
+        /// </summary>
+        /// <param name="spriteBatch">
+        /// The SpriteBatch to draw the paddle with.  This method should 
+        /// be invoked between SpriteBatch.Begin() and SpriteBatch.End() calls.
+        /// </param>
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(texture, bounds, Color.Green);
+            spriteBatch.Draw(texture, Bounds, Color.Green);
         }
     }
 }

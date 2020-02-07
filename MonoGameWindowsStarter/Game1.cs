@@ -89,6 +89,7 @@ namespace MonoGameWindowsStarter
                 ball.Velocity.X *= -1;
                 var delta =  (paddle.Bounds.X + paddle.Bounds.Width) - (ball.Bounds.X - ball.Bounds.Radius);
                 ball.Bounds.X += 2*delta;
+                paddle.BounceSFX.Play();
             }
 
             // TODO: Add your update logic here

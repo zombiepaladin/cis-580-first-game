@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
 
@@ -29,6 +30,11 @@ namespace MonoGameWindowsStarter
         /// This paddle's texture
         /// </summary>
         Texture2D texture;
+
+        /// <summary>
+        /// The sound of the ball striking the paddle
+        /// </summary>
+        public SoundEffect BounceSFX;
 
         /// <summary>
         /// Creates a paddle
@@ -58,6 +64,7 @@ namespace MonoGameWindowsStarter
         public void LoadContent(ContentManager content)
         {
             texture = content.Load<Texture2D>("pixel");
+            BounceSFX = content.Load<SoundEffect>("blip");
         }
 
         /// <summary>

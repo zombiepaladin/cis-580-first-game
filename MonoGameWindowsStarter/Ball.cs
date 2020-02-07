@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
 
@@ -23,6 +24,11 @@ namespace MonoGameWindowsStarter
         /// The ball's texture
         /// </summary>
         Texture2D texture;
+
+        /// <summary>
+        /// A sound effect of the ball bouncing off a wall
+        /// </summary>
+        SoundEffect bounceSFX;
 
         /// <summary>
         /// The ball's bounds
@@ -73,6 +79,7 @@ namespace MonoGameWindowsStarter
         public void LoadContent(ContentManager content)
         {
             texture = content.Load<Texture2D>("ball");
+            bounceSFX = content.Load<SoundEffect>("bounce");
         }
 
         /// <summary>
@@ -81,8 +88,10 @@ namespace MonoGameWindowsStarter
         /// <param name="gameTime">The current GameTime</param>
         public void Update(GameTime gameTime)
         {
+            // Grab the game's viewport (the visible region of the screen)
             var viewport = game.GraphicsDevice.Viewport;
 
+            // Update the ball's posistion
             Bounds.Center += 0.5f * (float)gameTime.ElapsedGameTime.TotalMilliseconds * Velocity;
 
             // Check for wall collisions
@@ -91,6 +100,7 @@ namespace MonoGameWindowsStarter
                 Velocity.Y *= -1;
                 float delta = Bounds.Radius - Bounds.Y;
                 Bounds.Y += 2 * delta;
+                bounceSFX.Play();
             }
 
             if (Bounds.Center.Y > viewport.Height - Bounds.Radius)
@@ -98,13 +108,12 @@ namespace MonoGameWindowsStarter
                 Velocity.Y *= -1;
                 float delta = viewport.Height - Bounds.Radius - Bounds.Y;
                 Bounds.Y += 2 * delta;
+                bounceSFX.Play();
             }
 
             if (Bounds.X < 0)
             {
-                //Velocity.X *= -1;
-                //float delta = Bounds.Radius - Bounds.X;
-                //Bounds.X += 2 * delta;
+                // If we hit the back wall, stop the ball
                 Velocity = Vector2.Zero;
             }
 
@@ -113,6 +122,7 @@ namespace MonoGameWindowsStarter
                 Velocity.X *= -1;
                 float delta = viewport.Width - Bounds.Radius - Bounds.X;
                 Bounds.X += 2 * delta;
+                bounceSFX.Play();
             }
         }
 
